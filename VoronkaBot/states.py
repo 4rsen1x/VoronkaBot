@@ -1,6 +1,15 @@
 from aiogram.dispatcher.filters.state import StatesGroup, State
 
 
+class NewFeatureStates(StatesGroup):
+    new_feature = State()
+
+
+class ErrorStates(StatesGroup):
+    platform = State()
+    report = State()
+
+
 class MenuStates(StatesGroup):
     our_mission = State()
     about_voronka = State()
