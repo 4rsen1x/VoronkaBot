@@ -1,6 +1,10 @@
 from aiogram.dispatcher.filters.state import StatesGroup, State
 
 
+class GetCVStates(StatesGroup):
+    cv = State()
+
+
 class NewFeatureStates(StatesGroup):
     new_feature = State()
 
@@ -23,3 +27,6 @@ class MenuStates(StatesGroup):
     new_feature = State()
     download_app = State()
     support_project = State()
+    change_studlife_from_team = State()
+    change_studlife_from_support = State()
+    change_studlife_from_our_mission = State()

@@ -93,6 +93,31 @@ async def _(message: types.Message):
     await about_service(message)
 
 
+@dp.message_handler(Text(equals="Назад"), state=MenuStates.change_stud_life)
+async def _(message: types.Message):
+    await about_voronka(message)
+
+
+@dp.message_handler(Text(equals="Назад"), state=MenuStates.change_studlife_from_support)
+async def _(message: types.Message):
+    await help_with_promotion(message)
+
+
+@dp.message_handler(Text(equals="Назад"), state=MenuStates.change_studlife_from_our_mission)
+async def _(message: types.Message):
+    await our_mission(message)
+
+
+@dp.message_handler(Text(equals="Назад"), state=MenuStates.change_studlife_from_team)
+async def _(message: types.Message):
+    await about_team(message)
+
+
+@dp.message_handler(Text(equals="Назад"), state=GetCVStates.cv)
+async def _(message: types.Message):
+    await change_studlife(message)
+
+
 @dp.message_handler(Text(equals="Назад"), state="*")
 async def main_view(message: types.Message):
     await message.answer(local("greet", message.from_user.id), reply_markup=main_menu(message.from_user.id))
@@ -148,7 +173,7 @@ async def about_voronka(message: types.Message):
 async def our_mission(message: types.Message):
     await message.answer(
         local("our_mission", message.from_id),
-        reply_markup=change_studlife(message.from_user.id)
+        reply_markup=change_studlife_menu(message.from_user.id)
     )
     await MenuStates.our_mission.set()
 
@@ -167,9 +192,10 @@ async def about_service(message: types.Message):
 @dp.message_handler(Text(equals="О команде"), state="*")
 async def about_team(message: types.Message):
     await message.answer(
-        local("about_team",
-              message.from_id),
-        reply_markup=change_studlife(message.from_id)
+        local(
+            "about_team", message.from_id
+        ),
+        reply_markup=change_studlife_menu(message.from_user.id)
     )
     await MenuStates.about_team.set()
 
@@ -232,7 +258,7 @@ async def new_feature_sent(message: types.Message, state: FSMContext):
 
     await bot.send_message(
         ADMIN_ID,
-        f"Новая фича от {message.from_user.get_mention(as_html=True)}"
+        f"Новая фича от {message.from_user.get_mention()}"
     )
     await message.forward(ADMIN_ID)
     await state.finish()
@@ -338,7 +364,7 @@ async def error_report_sent(message: types.Message, state: FSMContext):
     platform = data.get("platform")
     await bot.send_message(
         ADMIN_ID,
-        f"Сообщение об ошибке от {message.from_user.get_mention(as_html=True)}\nПлатформа: {platform}"
+        f"Сообщение об ошибке от {message.from_user.get_mention()}\nПлатформа: {platform}"
     )
     await message.forward(ADMIN_ID)
     await state.finish()
@@ -351,9 +377,81 @@ async def error_report_sent(message: types.Message, state: FSMContext):
     )
 
 
-@dp.message_handler(Text(equals="Хочу менять студлайф с вами!"))
-async def _(message: types.Message):
-    pass
+@dp.message_handler(Text(equals="Хочу менять студлайф с вами!"), state=MenuStates.about_team)
+async def change_studlife(message: types.Message):
+    await message.answer(
+        local(
+            "change_studlife",
+            message.from_id
+        ),
+        reply_markup=studlife_menu(message.from_id)
+    )
+    await MenuStates.change_studlife_from_team.set()
+
+
+@dp.message_handler(Text(equals="Хочу менять студлайф с вами!"), state=MenuStates.our_mission)
+async def change_studlife(message: types.Message):
+    await message.answer(
+        local(
+            "change_studlife",
+            message.from_id
+        ),
+        reply_markup=studlife_menu(message.from_id)
+    )
+    await MenuStates.change_studlife_from_our_mission.set()
+
+
+@dp.message_handler(Text(equals="Хочу менять студлайф с вами!"), state=MenuStates.support_project)
+async def change_studlife(message: types.Message):
+    await message.answer(
+        local(
+            "change_studlife",
+            message.from_id
+        ),
+        reply_markup=studlife_menu(message.from_id)
+    )
+    await MenuStates.change_studlife_from_support.set()
+
+
+@dp.message_handler(Text(equals="Хочу менять студлайф с вами!"), state=MenuStates.about_voronka)
+async def change_studlife(message: types.Message):
+    await message.answer(
+        local(
+            "change_studlife",
+            message.from_id
+        ),
+        reply_markup=studlife_menu(message.from_id)
+    )
+    await MenuStates.change_stud_life.set()
+
+
+@dp.message_handler(Text(equals="Посмотреть доступные вакансии"), state="*")
+async def get_cv(message: types.Message):
+    await message.answer(
+        local(
+            "get_cv",
+            message.from_id
+        ),
+        reply_markup=back_begin_menu(message.from_id)
+    )
+    await GetCVStates.cv.set()
+
+
+@dp.message_handler(state=GetCVStates.cv)
+async def cv_sent(message: types.Message, state: FSMContext):
+    await bot.send_message(
+        ADMIN_ID,
+        f"CV от {message.from_user.get_mention()}"
+    )
+    await message.forward(ADMIN_ID)
+    await message.answer(
+        local(
+            "cv_sent",
+            message.from_id
+        ),
+        reply_markup=back_begin_menu(message.from_id)
+    )
+    await state.finish()
 
 
 def start_bot(dp: Dispatcher):

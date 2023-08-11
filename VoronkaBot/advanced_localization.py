@@ -85,7 +85,10 @@ translations = {
         "android_app_button": "Приложение на Android",
         "bot_app_button": "Бот",
         "i_am_organisation_button": "Я организатор",
-
+        "show_vacancies_button": "Посмотреть доступные вакансии",
+        "change_studlife": "Выберите из меню: ",
+        "get_cv": "Если ты очень хочешь стать частью нашей команды, расскажи, каким образом ты можешь быть нам помочь и по возможности прикрепи CV",
+        "cv_sent": "Спасибо! Мы обязательно напишем тебе в ближайшее время!",
     },
     "en": {
         "start_message": "Language\nЯзык",
@@ -155,6 +158,10 @@ translations = {
         "android_app_button": "",
         "bot_app_button": "",
         "i_am_organisation_button": "",
+        "show_vacancies_button": "",
+        "change_studlife": "",
+        "get_cv": "",
+        "cv_sent": "",
     }
 }
 

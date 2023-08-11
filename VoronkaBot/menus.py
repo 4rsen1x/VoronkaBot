@@ -65,7 +65,7 @@ def about_voronka_menu(user_id):
     return menu
 
 
-def change_studlife(user_id):
+def change_studlife_menu(user_id):
     our_mission_kb = [[types.KeyboardButton(text=local(
         "change_studlife_button", user_id))],
         [types.KeyboardButton(text=local("back_button", user_id)),
@@ -153,7 +153,8 @@ def inline_tg_channel(user_id):
 
 def inline_landing_link(user_id):
     menu = types.InlineKeyboardMarkup()
-    landing_link = types.InlineKeyboardButton(local("open_button", user_id), url=LANDING_LINK)
+    landing_link = types.InlineKeyboardButton(
+        local("open_button", user_id), url=LANDING_LINK)
     menu.add(landing_link)
     return menu
 
@@ -184,4 +185,12 @@ def back_begin_menu(user_id):
 
 
 def studlife_menu(user_id):
-    pass
+    studlife_kb = [
+        [types.KeyboardButton(text=local("show_vacancies_button", user_id)),
+         types.KeyboardButton(text=local("tell_friends_button", user_id))],
+        [types.KeyboardButton(text=local("back_button", user_id)),
+         types.KeyboardButton(text=local("to_begin_button", user_id))]
+    ]
+    menu = types.ReplyKeyboardMarkup(
+        keyboard=studlife_kb, resize_keyboard=True)
+    return menu
