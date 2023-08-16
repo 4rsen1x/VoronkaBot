@@ -19,7 +19,7 @@ from advanced_localization import local
 from middlewares import TranslationMiddleware
 from aiogram.types import InputFile
 from aiogram_media_group import media_group_handler
-
+import logging
 
 bot = Bot(token=BOT_KEY, parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -297,12 +297,14 @@ async def new_feature_idea(message: types.Message):
 
 @dp.message_handler(state=NewFeatureStates.new_feature, content_types=types.ContentType.ANY)
 async def new_feature_sent_single_media(message: types.Message, state: FSMContext):
-
-    await bot.send_message(
-        GROUP_ID,
-        f"Новая фича от {message.from_user.get_mention()}"
-    )
-    await message.forward(GROUP_ID)
+    try:
+        await bot.send_message(
+            GROUP_ID,
+            f"Новая фича от {message.from_user.get_mention()}"
+        )
+        await message.forward(GROUP_ID)
+    except Exception as e:
+        logging.error(str(e))
     await state.finish()
     await message.answer(
         local(
@@ -318,13 +320,15 @@ async def new_feature_sent_single_media(message: types.Message, state: FSMContex
 @dp.message_handler(state=NewFeatureStates.new_feature, is_media_group=True, content_types=types.ContentType.ANY)
 @media_group_handler
 async def new_feature_sent_media_group(messages: List[types.Message], state: FSMContext):
-
-    await bot.send_message(
-        GROUP_ID,
-        f"Новая фича от {messages[0].from_user.get_mention()}"
-    )
-    for message in messages:
-        await message.forward(GROUP_ID)
+    try:
+        await bot.send_message(
+            GROUP_ID,
+            f"Новая фича от {messages[0].from_user.get_mention()}"
+        )
+        for message in messages:
+            await message.forward(GROUP_ID)
+    except Exception as e:
+        logging.error(str(e))
     await state.finish()
     await messages[0].answer(
         local(
@@ -431,12 +435,15 @@ async def get_platform(message: types.Message, state: FSMContext):
 async def error_report_sent_media_group(messages: List[types.Message], state: FSMContext):
     data = await state.get_data()
     platform = data.get("platform")
-    await bot.send_message(
-        GROUP_ID,
-        f"Сообщение об ошибке от {messages[0].from_user.get_mention()}\nПлатформа: {platform}"
-    )
-    for message in messages:
-        await message.forward(GROUP_ID)
+    try:
+        await bot.send_message(
+            GROUP_ID,
+            f"Сообщение об ошибке от {messages[0].from_user.get_mention()}\nПлатформа: {platform}"
+        )
+        for message in messages:
+            await message.forward(GROUP_ID)
+    except Exception as e:
+        logging.error(str(e))
     await state.finish()
     await message.answer(
         local(
@@ -452,11 +459,14 @@ async def error_report_sent_media_group(messages: List[types.Message], state: FS
 async def error_report_sent_single_media(message: types.Message, state: FSMContext):
     data = await state.get_data()
     platform = data.get("platform")
-    await bot.send_message(
-        GROUP_ID,
-        f"Сообщение об ошибке от {message.from_user.get_mention()}\nПлатформа: {platform}"
-    )
-    await message.forward(GROUP_ID)
+    try:
+        await bot.send_message(
+            GROUP_ID,
+            f"Сообщение об ошибке от {message.from_user.get_mention()}\nПлатформа: {platform}"
+        )
+        await message.forward(GROUP_ID)
+    except Exception as e:
+        logging.error(str(e))
     await state.finish()
     await message.answer(
         local(
@@ -531,12 +541,15 @@ async def get_cv_single_media(message: types.Message):
 @dp.message_handler(state=GetCVStates.cv, is_media_group=True, content_types=types.ContentType.ANY)
 @media_group_handler
 async def cv_sent_media_group(messages: List[types.Message], state: FSMContext):
-    await bot.send_message(
-        GROUP_ID,
-        f"CV от {messages[0].from_user.get_mention()}"
-    )
-    for message in messages:
-        await message.forward(GROUP_ID)
+    try:
+        await bot.send_message(
+            GROUP_ID,
+            f"CV от {messages[0].from_user.get_mention()}"
+        )
+        for message in messages:
+            await message.forward(GROUP_ID)
+    except Exception as e:
+        logging.error(str(e))
     await messages[0].answer(
         local(
             "cv_sent",
@@ -550,11 +563,14 @@ async def cv_sent_media_group(messages: List[types.Message], state: FSMContext):
 
 @dp.message_handler(state=GetCVStates.cv, content_types=types.ContentType.ANY)
 async def cv_sent(message: types.Message, state: FSMContext):
-    await bot.send_message(
-        GROUP_ID,
-        f"CV от {message.from_user.get_mention()}"
-    )
-    await message.forward(GROUP_ID)
+    try:
+        await bot.send_message(
+            GROUP_ID,
+            f"CV от {message.from_user.get_mention()}"
+        )
+        await message.forward(GROUP_ID)
+    except Exception as e:
+        logging.error(str(e))
     await message.answer(
         local(
             "cv_sent",
