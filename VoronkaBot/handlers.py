@@ -17,6 +17,9 @@ from load_config import BOT_KEY, DB_PATH
 from db_class import db
 from advanced_localization import local
 from middlewares import TranslationMiddleware
+from aiogram.types import InputFile
+from aiogram_media_group import media_group_handler
+
 
 bot = Bot(token=BOT_KEY, parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -27,9 +30,9 @@ dp.middleware.setup(TranslationMiddleware())
 async def greet(message: types.Message):
     if not db.user_exists(message.from_user.id):
         db.add_user(message.from_user.id, "ru")
-        await message.answer("Language\nЯзык", reply_markup=language_menu)
+        await message.answer(local("start_pick_lang", message.from_id), reply_markup=language_menu)
     else:
-        await message.answer("Language\nЯзык", reply_markup=language_menu)
+        await message.answer(local("start_pick_lang", message.from_id), reply_markup=language_menu)
 
 # Back buttons
 
@@ -171,8 +174,13 @@ async def about_voronka(message: types.Message):
 
 @dp.message_handler(Text(equals="Наша миссия"), state="*")
 async def our_mission(message: types.Message):
-    await message.answer(
-        local("our_mission", message.from_id),
+    # await message.answer(
+    #     local("our_mission", message.from_id),
+    #     reply_markup=change_studlife_menu(message.from_user.id)
+    # )
+    await message.answer_photo(
+        InputFile("media/our_mission.jpg"),
+        caption=local("our_mission", message.from_id),
         reply_markup=change_studlife_menu(message.from_user.id)
     )
     await MenuStates.our_mission.set()
@@ -180,8 +188,15 @@ async def our_mission(message: types.Message):
 
 @dp.message_handler(Text(equals="О сервисе"), state="*")
 async def about_service(message: types.Message):
-    await message.answer(
-        local(
+    # await message.answer(
+    #     local(
+    #         "about_service", message.from_id
+    #     ),
+    #     reply_markup=about_service_menu(message.from_user.id)
+    # )
+    await message.answer_photo(
+        InputFile("media/about_service.jpg"),
+        caption=local(
             "about_service", message.from_id
         ),
         reply_markup=about_service_menu(message.from_user.id)
@@ -191,8 +206,15 @@ async def about_service(message: types.Message):
 
 @dp.message_handler(Text(equals="О команде"), state="*")
 async def about_team(message: types.Message):
-    await message.answer(
-        local(
+    # await message.answer(
+    #     local(
+    #         "about_team", message.from_id
+    #     ),
+    #     reply_markup=change_studlife_menu(message.from_user.id)
+    # )
+    await message.answer_photo(
+        InputFile("media/about_team.jpg"),
+        caption=local(
             "about_team", message.from_id
         ),
         reply_markup=change_studlife_menu(message.from_user.id)
@@ -211,36 +233,56 @@ async def about_features(message: types.Message):
 
 @dp.message_handler(Text(equals="Выбор интересов"), state="*")
 async def pick_interests(message: types.Message):
-    await message.answer(
-        local("pick_interests", message.from_id)
+    # await message.answer(
+    #     local("pick_interests", message.from_id)
+    # )
+    await message.answer_animation(
+        InputFile("media/pick_interests.gif"),
+        caption=local("pick_interests", message.from_id)
     )
 
 
 @dp.message_handler(Text(equals="Интеграция с ЕЛК"), state="*")
 async def integrate_with_elk(message: types.Message):
-    await message.answer(
-        local("integrate_with_elk", message.from_id)
+    # await message.answer(
+    #     local("integrate_with_elk", message.from_id)
+    # )
+    await message.answer_animation(
+        InputFile("media/elk_integration.gif"),
+        caption=local("integrate_with_elk", message.from_id)
     )
 
 
 @dp.message_handler(Text(equals="Лента мероприятий"), state="*")
 async def event_feed(message: types.Message):
-    await message.answer(
-        local("event_feed", message.from_id)
+    # await message.answer(
+    #     local("event_feed", message.from_id)
+    # )
+    await message.answer_animation(
+        InputFile("media/event_feed.gif"),
+        caption=local("event_feed", message.from_id)
     )
 
 
 @dp.message_handler(Text(equals="Мои ивенты"), state="*")
 async def my_events(message: types.Message):
-    await message.answer(
-        local("my_events", message.from_id)
+    # await message.answer(
+    #     local("my_events", message.from_id)
+    # )
+    await message.answer_animation(
+        InputFile("media/my_events.gif"),
+        caption=local("my_events", message.from_id)
     )
 
 
 @dp.message_handler(Text(equals="Профиль студенческой организации"), state="*")
 async def organisation_profile(message: types.Message):
-    await message.answer(
-        local("organisation_profile", message.from_id)
+    # await message.answer(
+    #     local("organisation_profile", message.from_id)
+    # )
+    await message.answer_animation(
+        InputFile("media/organisation_profile.gif"),
+        caption=local("organisation_profile", message.from_id)
     )
 
 
@@ -253,23 +295,46 @@ async def new_feature_idea(message: types.Message):
     await NewFeatureStates.new_feature.set()
 
 
-@dp.message_handler(state=NewFeatureStates.new_feature)
-async def new_feature_sent(message: types.Message, state: FSMContext):
+@dp.message_handler(state=NewFeatureStates.new_feature, content_types=types.ContentType.ANY)
+async def new_feature_sent_single_media(message: types.Message, state: FSMContext):
 
     await bot.send_message(
-        ADMIN_ID,
+        GROUP_ID,
         f"Новая фича от {message.from_user.get_mention()}"
     )
-    await message.forward(ADMIN_ID)
+    await message.forward(GROUP_ID)
     await state.finish()
     await message.answer(
         local(
             "new_feature_sent",
             message.from_id
-        ),
-        reply_markup=back_begin_menu(message.from_id)
+        )
+        # reply_markup=back_begin_menu(message.from_id)
     )
     await MenuStates.new_feature.set()
+    await main_view(message)
+
+
+@dp.message_handler(state=NewFeatureStates.new_feature, is_media_group=True, content_types=types.ContentType.ANY)
+@media_group_handler
+async def new_feature_sent_media_group(messages: List[types.Message], state: FSMContext):
+
+    await bot.send_message(
+        GROUP_ID,
+        f"Новая фича от {messages[0].from_user.get_mention()}"
+    )
+    for message in messages:
+        await message.forward(GROUP_ID)
+    await state.finish()
+    await messages[0].answer(
+        local(
+            "new_feature_sent",
+            message.from_id
+        )
+        # reply_markup=back_begin_menu(message.from_id)
+    )
+    await MenuStates.new_feature.set()
+    await main_view(messages[0])
 
 
 @dp.message_handler(Text(equals="Скачать приложение"), state="*")
@@ -316,6 +381,9 @@ async def get_stickers(message: types.Message):
             message.from_id
         )
     )
+    await message.answer_sticker(
+        sticker=STICKER_ID
+    )
 
 
 @dp.message_handler(Text(equals="А можно глянуть лендинг?"), state="*")
@@ -358,23 +426,46 @@ async def get_platform(message: types.Message, state: FSMContext):
     await ErrorStates.report.set()
 
 
-@dp.message_handler(state=ErrorStates.report)
-async def error_report_sent(message: types.Message, state: FSMContext):
+@dp.message_handler(state=ErrorStates.report, is_media_group=True, content_types=types.ContentType.ANY)
+@media_group_handler
+async def error_report_sent_media_group(messages: List[types.Message], state: FSMContext):
     data = await state.get_data()
     platform = data.get("platform")
     await bot.send_message(
-        ADMIN_ID,
-        f"Сообщение об ошибке от {message.from_user.get_mention()}\nПлатформа: {platform}"
+        GROUP_ID,
+        f"Сообщение об ошибке от {messages[0].from_user.get_mention()}\nПлатформа: {platform}"
     )
-    await message.forward(ADMIN_ID)
+    for message in messages:
+        await message.forward(GROUP_ID)
     await state.finish()
     await message.answer(
         local(
             "error_report_sent",
             message.from_id
-        ),
-        reply_markup=main_menu(message.from_id)
+        )
+        # reply_markup=main_menu(message.from_id)
     )
+    await main_view(messages[0])
+
+
+@dp.message_handler(state=ErrorStates.report, content_types=types.ContentType.ANY)
+async def error_report_sent_single_media(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    platform = data.get("platform")
+    await bot.send_message(
+        GROUP_ID,
+        f"Сообщение об ошибке от {message.from_user.get_mention()}\nПлатформа: {platform}"
+    )
+    await message.forward(GROUP_ID)
+    await state.finish()
+    await message.answer(
+        local(
+            "error_report_sent",
+            message.from_id
+        )
+        # reply_markup=main_menu(message.from_id)
+    )
+    await main_view(message)
 
 
 @dp.message_handler(Text(equals="Хочу менять студлайф с вами!"), state=MenuStates.about_team)
@@ -426,7 +517,7 @@ async def change_studlife(message: types.Message):
 
 
 @dp.message_handler(Text(equals="Посмотреть доступные вакансии"), state="*")
-async def get_cv(message: types.Message):
+async def get_cv_single_media(message: types.Message):
     await message.answer(
         local(
             "get_cv",
@@ -437,21 +528,42 @@ async def get_cv(message: types.Message):
     await GetCVStates.cv.set()
 
 
-@dp.message_handler(state=GetCVStates.cv)
+@dp.message_handler(state=GetCVStates.cv, is_media_group=True, content_types=types.ContentType.ANY)
+@media_group_handler
+async def cv_sent_media_group(messages: List[types.Message], state: FSMContext):
+    await bot.send_message(
+        GROUP_ID,
+        f"CV от {messages[0].from_user.get_mention()}"
+    )
+    for message in messages:
+        await message.forward(GROUP_ID)
+    await messages[0].answer(
+        local(
+            "cv_sent",
+            message.from_id
+        )
+        # reply_markup=back_begin_menu(messages[0].from_id)
+    )
+    await state.finish()
+    await main_view(messages[0])
+
+
+@dp.message_handler(state=GetCVStates.cv, content_types=types.ContentType.ANY)
 async def cv_sent(message: types.Message, state: FSMContext):
     await bot.send_message(
-        ADMIN_ID,
+        GROUP_ID,
         f"CV от {message.from_user.get_mention()}"
     )
-    await message.forward(ADMIN_ID)
+    await message.forward(GROUP_ID)
     await message.answer(
         local(
             "cv_sent",
             message.from_id
-        ),
-        reply_markup=back_begin_menu(message.from_id)
+        )
+        # reply_markup=back_begin_menu(message.from_id)
     )
     await state.finish()
+    await main_view(message)
 
 
 def start_bot(dp: Dispatcher):

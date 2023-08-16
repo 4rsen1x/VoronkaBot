@@ -27,7 +27,7 @@ class Database:
 
     def set_lang(self, user_id, lang):
         with self.connection:
-            return self.cursor.execute("UPDATE users SET lang = ? WHERE user_id = ?", (user_id, lang, ))
+            return self.cursor.execute("UPDATE users SET lang = ? WHERE user_id = ?", (lang, user_id, ))
 
 
 db = Database(DB_PATH)

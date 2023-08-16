@@ -89,6 +89,7 @@ translations = {
         "change_studlife": "Выберите из меню: ",
         "get_cv": "Если ты очень хочешь стать частью нашей команды, расскажи, каким образом ты можешь быть нам помочь и по возможности прикрепи CV",
         "cv_sent": "Спасибо! Мы обязательно напишем тебе в ближайшее время!",
+        "start_pick_lang": "Language\nЯзык",
     },
     "en": {
         "start_message": "Language\nЯзык",
@@ -162,6 +163,7 @@ translations = {
         "change_studlife": "",
         "get_cv": "",
         "cv_sent": "",
+        "start_pick_lang": "Language\nЯзык",
     }
 }
 
@@ -170,7 +172,10 @@ def local(text, user_id):
     global translations
     lang = db.get_lang(user_id)
     try:
-        return translations[lang][text]
+        translated_text = translations[lang][text]
+        if translated_text == "":
+            translated_text = translations["ru"][text]
+        return translated_text
     except Exception as e:
         logging.error(str(e))
         return text
